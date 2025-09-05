@@ -1,0 +1,23 @@
+import { useState } from 'react'
+import { Routes, Route } from 'react-router-dom';
+import './App.css'
+import Layout from './components/Layout/Layout.jsx';
+import TextPage from './containers/TextPage/TextPage.jsx';
+import FilePage from './containers/FilePage/FilePage.jsx';
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <Layout>
+      <Routes>
+        <Route path="/texto" element={<TextPage />} />
+        <Route path="/archivo" element={<FilePage />} />
+        <Route path="*" element={<TextPage />} /> {/* Default to text page */}
+      </Routes>
+    </Layout>
+  );
+
+}
+
+export default App
