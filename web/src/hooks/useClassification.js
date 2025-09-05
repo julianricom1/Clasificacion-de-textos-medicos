@@ -6,7 +6,7 @@ function useClassification() {
 
   const classify = (text) => {
     // Mock classification logic
-    setResult(Math.random() > 0.5 ? "<Tecnico>" : "<Plano>");
+    setResult(Math.random() > 0.5 ? "Tecnico" : "Plano");
     setMetrics(["123456789", "123456789", "123456789"]);
   };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import FolderIcon from '@mui/icons-material/Folder';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,9 @@ function SideMenu() {
     const navigate = useNavigate();
 
     return (
-        <Box sx={{ width: 250, bgcolor: 'background.paper' }}>
+        
+        <Box className="menu" sx={{ width: 250, bgcolor: 'background.paper' }}>
+            <Typography variant="h6"><strong>Clasificacion de textos Medicos</strong></Typography>
             <List>
                 <ListItem disablePadding>
                     <ListItemButton onClick={() => navigate('/texto')}>

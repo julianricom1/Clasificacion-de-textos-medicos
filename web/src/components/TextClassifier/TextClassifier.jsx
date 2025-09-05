@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TextField, Button, Box, Typography, Card, CardContent } from '@mui/material';
+import { TextField, Button, Box, Typography, Card, CardContent, Grid } from '@mui/material';
 import useClassification from '../../hooks/useClassification';
 
 function TextClassifier() {
@@ -12,7 +12,18 @@ function TextClassifier() {
 
   return (
     <Box>
-      <Typography variant="h4">Clasificar Texto</Typography>
+      <Grid container spacing={2}>
+        <Grid size={9}>
+          <Typography variant="h5"><strong>Clasificar Texto</strong></Typography>
+        </Grid>
+        <Grid size={1}>
+          <Button className="clasifyer_button"  variant="contained" color="primary" onClick={handleClassify} sx={{ mt: 2 }}>
+            Clasificar
+          </Button>
+        </Grid>
+
+      </Grid>
+      
       <TextField
         fullWidth
         multiline
@@ -22,9 +33,7 @@ function TextClassifier() {
         onChange={(e) => setInputText(e.target.value)}
         sx={{ mt: 2, bgcolor: '#f3e5f5' }}
       />
-      <Button variant="contained" color="primary" onClick={handleClassify} sx={{ mt: 2 }}>
-        Clasificar
-      </Button>
+      
       {result && (
         <Box sx={{ mt: 4 }}>
           <Typography variant="h6">El texto esta expresado en lenguaje {result}</Typography>

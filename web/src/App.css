@@ -34,3 +34,17 @@
 .read-the-docs {
   color: #888;
 }
+
+.menu {
+  border-right: solid;
+    border-right-color: #bebebe;
+    border-right-width: thin;
+}
+.menu h6 {
+  margin: 1rem;
+}
+
+.clasifyer_button {
+  margin-top: 0 !important;
+
+}
