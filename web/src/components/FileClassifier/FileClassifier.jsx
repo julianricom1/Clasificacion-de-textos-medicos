@@ -18,30 +18,48 @@ const columns = [
     editable: false,
   },
   {
-    field: 'metrica1',
-    headerName: 'Metrica 1',
+    field: 'pr_auc',
+    headerName: 'PR_AUC',
     type: 'number',
     width: 110,
     editable: false,
   },
   {
-    field: 'metrica2',
-    headerName: 'Metrica 2',
+    field: 'roc_auc',
+    headerName: 'ROC_AUC',
+    sortable: true,
+    width: 160
+  },
+  {
+    field: 'f1',
+    headerName: 'F1',
+    sortable: true,
+    width: 160
+  },
+  {
+    field: 'recall',
+    headerName: 'Recall',
+    sortable: true,
+    width: 160
+  },
+  {
+    field: 'accuracy',
+    headerName: 'Accuracy',
     sortable: true,
     width: 160
   },
 ];
 
 const rows = [
-  { id: 1, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', metrica1: 14, metrica2: 14 },
-  { id: 2, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', metrica1: 31, metrica2: 31 },
-  { id: 3, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Tecnico', metrica1: 31, metrica2: 31 },
-  { id: 4, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', metrica1: 11, metrica2: 11 },
-  { id: 5, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', metrica1: null, metrica2: null },
-  { id: 6, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Tecnico', metrica1: 150, metrica2: 150 },
-  { id: 7, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', metrica1: 44, metrica2: 44 },
-  { id: 8, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Tecnico', metrica1: 36, metrica2: 36 },
-  { id: 9, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', metrica1: 65, metrica2: 65 },
+  { id: 1, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
+  { id: 2, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
+  { id: 3, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Tecnico', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
+  { id: 4, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
+  { id: 5, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
+  { id: 6, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Tecnico', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
+  { id: 7, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
+  { id: 8, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Tecnico', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
+  { id: 9, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
 ];
 
 function FileClassifier() {

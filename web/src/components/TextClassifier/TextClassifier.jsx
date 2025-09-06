@@ -38,14 +38,36 @@ function TextClassifier() {
         <Box sx={{ mt: 4 }}>
           <Typography variant="h6">El texto esta expresado en lenguaje {result}</Typography>
           <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-            {metrics.map((metric, index) => (
-              <Card key={index} sx={{ minWidth: 150 }}>
-                <CardContent>
-                  <Typography variant="subtitle1">Metrica {index + 1}</Typography>
-                  <Typography variant="h5">{metric}</Typography>
-                </CardContent>
-              </Card>
-            ))}
+            <Card sx={{ minWidth: 150 }}>
+              <CardContent>
+                <Typography variant="subtitle1">PR_AUC</Typography>
+                <Typography variant="h5">{metrics[0]}</Typography>
+              </CardContent>
+            </Card>
+            <Card sx={{ minWidth: 150 }}>
+              <CardContent>
+                <Typography variant="subtitle1">ROC_AUC</Typography>
+                <Typography variant="h5">{metrics[1]}</Typography>
+              </CardContent>
+            </Card>
+            <Card sx={{ minWidth: 150 }}>
+              <CardContent>
+                <Typography variant="subtitle1">F1</Typography>
+                <Typography variant="h5">{metrics[2]}</Typography>
+              </CardContent>
+            </Card>
+            <Card sx={{ minWidth: 150 }}>
+              <CardContent>
+                <Typography variant="subtitle1">Recall</Typography>
+                <Typography variant="h5">{metrics[3]}</Typography>
+              </CardContent>
+            </Card>
+            <Card sx={{ minWidth: 150 }}>
+              <CardContent>
+                <Typography variant="subtitle1">Accuracy</Typography>
+                <Typography variant="h5">{metrics[4]}</Typography>
+              </CardContent>
+            </Card>
           </Box>
         </Box>
       )}
