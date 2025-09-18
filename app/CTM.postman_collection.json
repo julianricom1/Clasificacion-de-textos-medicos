@@ -1,0 +1,55 @@
+{
+	"info": {
+		"_postman_id": "e18adba7-5b06-4c6a-b31f-0cd64c616eac",
+		"name": "CTM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38540903",
+		"_collection_link": "https://a11111-7902.postman.co/workspace/My-Workspace1~965c955d-5fd7-4acc-8f01-39215eda47fc/collection/38540903-e18adba7-5b06-4c6a-b31f-0cd64c616eac?action=share&source=collection_link&creator=38540903"
+	},
+	"item": [
+		{
+			"name": "prediction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/health",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/v1//health",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"",
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
