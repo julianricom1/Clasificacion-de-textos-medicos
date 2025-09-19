@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TextField, Button, Box, Typography, Card, CardContent, Grid } from '@mui/material';
 import useClassification from '../../hooks/useClassification';
 
 function TextClassifier() {
   const [inputText, setInputText] = useState('');
-  const { classify, result, metrics } = useClassification();
+  const [doCall, setDoCall] = useState(false);
+
+  const { result, metrics } = useClassification(inputText,doCall);
 
   const handleClassify = () => {
-    classify(inputText);
+    setDoCall(true);
   };
 
   return (

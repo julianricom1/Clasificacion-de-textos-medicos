@@ -11,15 +11,11 @@ class PredictionResults(BaseModel):
 
 # Esquema para inputs múltiples
 class MultipleDataInputs(BaseModel):
-    inputs: List[DataInputSchema]
+    inputs: List[str]
 
     class Config:
         schema_extra = {
             "example": {
-                "inputs": [
-                    {
-                        "text": "Sample text for prediction"
-                    }
-                ]
+                "inputs": [ "Sample text for prediction" ]
             }
         }

@@ -24,6 +24,8 @@ class Settings(BaseSettings):
         "http://localhost:8000",  # type: ignore
         "https://localhost:3000",  # type: ignore
         "https://localhost:8000",  # type: ignore
+        "http://localhost:5173",  # type: ignore
+        "https://localhost:5173",  # type: ignore
     ]
 
     PROJECT_NAME: str = "Clasificacion de textos medicos"
