@@ -1,7 +1,9 @@
 from typing import Any, List, Optional
 
 from pydantic import BaseModel
-from model.processing.validation import DataInputSchema
+
+# from model.processing.validation import DataInputSchema
+
 
 # Esquema de los resultados de predicción
 class PredictionResults(BaseModel):
@@ -9,13 +11,10 @@ class PredictionResults(BaseModel):
     version: str
     predictions: Optional[List[int]]
 
+
 # Esquema para inputs múltiples
 class MultipleDataInputs(BaseModel):
     inputs: List[str]
 
     class Config:
-        schema_extra = {
-            "example": {
-                "inputs": [ "Sample text for prediction" ]
-            }
-        }
+        schema_extra = {"example": {"inputs": ["Sample text for prediction"]}}

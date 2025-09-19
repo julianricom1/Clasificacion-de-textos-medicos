@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "e18adba7-5b06-4c6a-b31f-0cd64c616eac",
+		"_postman_id": "e6bbf08f-8684-4895-80d6-e13dce439eb3",
 		"name": "CTM",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "38540903",
-		"_collection_link": "https://a11111-7902.postman.co/workspace/My-Workspace1~965c955d-5fd7-4acc-8f01-39215eda47fc/collection/38540903-e18adba7-5b06-4c6a-b31f-0cd64c616eac?action=share&source=collection_link&creator=38540903"
+		"_exporter_id": "13167355"
 	},
 	"item": [
 		{
@@ -13,12 +12,14 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "{{baseURL}}/health",
+					"raw": "{{baseURL}}/api/v1/predict",
 					"host": [
 						"{{baseURL}}"
 					],
 					"path": [
-						"health"
+						"api",
+						"v1",
+						"predict"
 					]
 				}
 			},
@@ -30,14 +31,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseURL}}/api/v1//health",
+					"raw": "{{baseURL}}/api/v1/health",
 					"host": [
 						"{{baseURL}}"
 					],
 					"path": [
 						"api",
 						"v1",
-						"",
 						"health"
 					]
 				}
@@ -45,11 +45,32 @@
 			"response": []
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
 			"key": "baseURL",
-			"value": "",
-			"type": "default"
+			"value": ""
 		}
 	]
 }
