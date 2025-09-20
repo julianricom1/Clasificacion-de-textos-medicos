@@ -1,70 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Box, Typography, Card, CardContent, Grid } from '@mui/material';
 import useClassification from '../../hooks/useClassification';
 import { DataGrid } from '@mui/x-data-grid';
+import Papa from "papaparse";
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 90 },
   {
     field: 'texto',
     headerName: 'Texto',
-    width: 150,
+    flex: 1, // Use flex for dynamic width
+    minWidth: 200, // Minimum width for responsiveness
     editable: false,
   },
   {
     field: 'clasificacion',
     headerName: 'Clasificacion',
-    width: 150,
+    flex: 0.5, // Use flex for dynamic width
+    minWidth: 150, // Minimum width for responsiveness
     editable: false,
-  },
-  {
-    field: 'pr_auc',
-    headerName: 'PR_AUC',
-    type: 'number',
-    width: 110,
-    editable: false,
-  },
-  {
-    field: 'roc_auc',
-    headerName: 'ROC_AUC',
-    sortable: true,
-    width: 160
-  },
-  {
-    field: 'f1',
-    headerName: 'F1',
-    sortable: true,
-    width: 160
-  },
-  {
-    field: 'recall',
-    headerName: 'Recall',
-    sortable: true,
-    width: 160
-  },
-  {
-    field: 'accuracy',
-    headerName: 'Accuracy',
-    sortable: true,
-    width: 160
-  },
-];
-
-const rows = [
-  { id: 1, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
-  { id: 2, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
-  { id: 3, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Tecnico', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
-  { id: 4, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
-  { id: 5, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
-  { id: 6, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Tecnico', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
-  { id: 7, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
-  { id: 8, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Tecnico', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
-  { id: 9, texto: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Pariatur distinctio aspernatur quos excepturi maxime quaerat porro soluta reiciendis modi hic impedit,', clasificacion: 'Plano', pr_auc:0.99, roc_auc:0.99,f1:0.99,recall:0.99,accuracy: 0.97 },
+  }
 ];
 
 function FileClassifier() {
   const [file, setFile] = useState(null);
-  const { classifyFile, result, metrics } = useClassification();
+  const [doCall, setDoCall] = useState(false);
+  const [inputText, setInputText] = useState([]);
+
+  const [rows, setRows] = useState([]);
+
+  const { result, metadata } = useClassification({inputText, doCall});
+
+  useEffect(() => {
+    if (result) {
+      const newRows = inputText.map((text, index) => ({
+        id: index + 1,
+        texto: text,
+        clasificacion: result[index] || 'N/A',
+      }));
+      setRows(newRows);
+      setDoCall(false); // Reset doCall after fetching result
+    }
+  }, [result, doCall]);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -72,8 +49,24 @@ function FileClassifier() {
 
   const handleClassify = () => {
     if (file) {
-      classifyFile(file);
+      readFile(file);
     }
+  };
+
+  const readFile = (file) => {
+    Papa.parse(file, {
+      header: true, // Assumes the CSV has headers
+      complete: function (results) {
+        const textValues = results.data
+          .filter((row) => row.text !== undefined) // Ensure "text" exists
+          .map((row) => row.text);
+        setInputText(textValues);
+        setDoCall(true);
+      },
+      error: function (error) {
+        console.error("Error parsing CSV:", error);
+      },
+    });
   };
 
   return (
@@ -89,7 +82,15 @@ function FileClassifier() {
       </Grid>
 
       </Grid>
-      <input type="file" onChange={handleFileChange} />
+      <Box sx={{ mt: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }}>
+          <Card sx={{ display: 'flex',justifyContent: 'center',minWidth: '100%' }} >
+            <CardContent>
+              <input type="file" accept=".csv" onChange={handleFileChange} />
+            </CardContent>
+          </Card>
+        </Box>
+      </Box>
       
       {result && (
         <Box sx={{ mt: 4 }}>
@@ -107,6 +108,41 @@ function FileClassifier() {
             checkboxSelection
             disableRowSelectionOnClick
           />
+          <br />
+          <Typography >La version usada del modelo es <strong>{metadata.model_version}</strong></Typography>
+          <Typography >Metricas del modelo</Typography>
+          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+            <Card sx={{ minWidth: '18.8%' }}>
+              <CardContent>
+                <Typography variant="subtitle1">PR_AUC</Typography>
+                <Typography variant="h5">{metadata.metrics.pr_auc}</Typography>
+              </CardContent>
+            </Card>
+            <Card sx={{ minWidth: '18.8%' }}>
+              <CardContent>
+                <Typography variant="subtitle1">ROC_AUC</Typography>
+                <Typography variant="h5">{metadata.metrics.roc_auc}</Typography>
+              </CardContent>
+            </Card>
+            <Card sx={{ minWidth: '18.8%' }}>
+              <CardContent>
+                <Typography variant="subtitle1">F1</Typography>
+                <Typography variant="h5">{metadata.metrics.f1_score}</Typography>
+              </CardContent>
+            </Card>
+            <Card sx={{ minWidth: '18.8%' }}>
+              <CardContent>
+                <Typography variant="subtitle1">Recall</Typography>
+                <Typography variant="h5">{metadata.metrics.recall}</Typography>
+              </CardContent>
+            </Card>
+            <Card sx={{ minWidth: '18.8%' }}>
+              <CardContent>
+                <Typography variant="subtitle1">Accuracy</Typography>
+                <Typography variant="h5">{metadata.metrics.accuracy}</Typography>
+              </CardContent>
+            </Card>
+          </Box>
         </Box>
       )}
     </Box>

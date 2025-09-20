@@ -9,6 +9,8 @@ from loguru import logger
 # from model.predict import make_prediction
 from app import __version__, schemas
 from app.config import settings
+import pandas as pd
+from fastapi import UploadFile, File
 
 MODEL_VERSION = "0.1.0"
 ###
@@ -45,4 +47,14 @@ async def predict(input_data: schemas.MultipleDataInputs) -> Any:
         "predictions": output["labels"],
         "errors": None,
         "version": MODEL_VERSION,
+        "metadata": {
+            "model_version": MODEL_VERSION,
+            "metrics": {
+                "accuracy": 0.99,
+                "recall": 0.99,
+                "f1_score": 0.99,
+                "pr_auc": 0.99,
+                "roc_auc": 0.99,
+            },
+        }
     }

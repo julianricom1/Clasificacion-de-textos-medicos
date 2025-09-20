@@ -3,10 +3,16 @@ import { TextField, Button, Box, Typography, Card, CardContent, Grid } from '@mu
 import useClassification from '../../hooks/useClassification';
 
 function TextClassifier() {
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState([]);
   const [doCall, setDoCall] = useState(false);
 
-  const { result, metrics } = useClassification(inputText,doCall);
+  const { result, metadata } = useClassification({inputText,doCall});
+
+  useEffect(() => {
+    if (result) {
+      setDoCall(false); // Reset doCall after fetching result
+    }
+  }, [result, doCall]);
 
   const handleClassify = () => {
     setDoCall(true);
@@ -32,42 +38,51 @@ function TextClassifier() {
         rows={6}
         placeholder="Escribe el texto a clasificar"
         value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
+        onChange={(e) => setInputText([e.target.value])}
         sx={{ mt: 2, bgcolor: '#f3e5f5' }}
       />
       
       {result && (
         <Box sx={{ mt: 4 }}>
-          <Typography variant="h6">El texto esta expresado en lenguaje {result}</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }}>
+            <Card sx={{ display: 'flex',justifyContent: 'center',minWidth: '100%' }} >
+              <CardContent>
+                <Typography variant="h6">El texto esta expresado en lenguaje <strong>{result}</strong></Typography>
+              </CardContent>
+            </Card>
+          </Box>
+          <br />
+          <Typography >La version usada del modelo es <strong>{metadata.model_version}</strong></Typography>
+          <Typography >Metricas del modelo</Typography>
           <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-            <Card sx={{ minWidth: 150 }}>
+            <Card sx={{ minWidth: '18.8%' }}>
               <CardContent>
                 <Typography variant="subtitle1">PR_AUC</Typography>
-                <Typography variant="h5">{metrics[0]}</Typography>
+                <Typography variant="h5">{metadata.metrics.pr_auc}</Typography>
               </CardContent>
             </Card>
-            <Card sx={{ minWidth: 150 }}>
+            <Card sx={{ minWidth: '18.8%' }}>
               <CardContent>
                 <Typography variant="subtitle1">ROC_AUC</Typography>
-                <Typography variant="h5">{metrics[1]}</Typography>
+                <Typography variant="h5">{metadata.metrics.roc_auc}</Typography>
               </CardContent>
             </Card>
-            <Card sx={{ minWidth: 150 }}>
+            <Card sx={{ minWidth: '18.8%' }}>
               <CardContent>
                 <Typography variant="subtitle1">F1</Typography>
-                <Typography variant="h5">{metrics[2]}</Typography>
+                <Typography variant="h5">{metadata.metrics.f1_score}</Typography>
               </CardContent>
             </Card>
-            <Card sx={{ minWidth: 150 }}>
+            <Card sx={{ minWidth: '18.8%' }}>
               <CardContent>
                 <Typography variant="subtitle1">Recall</Typography>
-                <Typography variant="h5">{metrics[3]}</Typography>
+                <Typography variant="h5">{metadata.metrics.recall}</Typography>
               </CardContent>
             </Card>
-            <Card sx={{ minWidth: 150 }}>
+            <Card sx={{ minWidth: '18.8%' }}>
               <CardContent>
                 <Typography variant="subtitle1">Accuracy</Typography>
-                <Typography variant="h5">{metrics[4]}</Typography>
+                <Typography variant="h5">{metadata.metrics.accuracy}</Typography>
               </CardContent>
             </Card>
           </Box>
