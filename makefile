@@ -1,8 +1,7 @@
-# Los pasos en este archivo pueden ser usados para su pipeline de Unit testing
-# en el caso que usted decida usar Python.
-
+# =========================
+# Lint / Tests
+# =========================
 .PHONY: lintfix lintcheck unittest
-
 lintfix:
 	poetry --directory="$(DIR)" install
 	poetry --directory="$(DIR)" run black .
@@ -21,149 +20,121 @@ unittest:
 	poetry --directory="$(DIR)" install
 	poetry --directory="$(DIR)" run pytest --cov=src -v -s --cov-fail-under=70 --cov-report term-missing
 
-# Agregue nuevas a partir de esta línea
-
+# =========
+# Variables
+# =========
 CURDIR ?= $(shell pwd)
+TERRAFORM_ENV      = student                
+REGION             = us-east-1
+TF_BACKEND_BUCKET  = infrastructura-clasificador-g8
+TERRAFORM_ENV = student
 
-docsbuild:
-	docker run --rm -e PLANTUML_LIMIT_SIZE=8192 -v "./docs/diagrams:/workspace" -w /workspace plantuml/plantuml **.puml
+# ================
+# Backend S3 
+# ================
+.PHONY: tf-backend-bucket
+tf-backend-bucket:
+	@echo ">> Verificando bucket S3: $(TF_BACKEND_BUCKET) en $(REGION)"
+	@if aws s3api head-bucket --bucket $(TF_BACKEND_BUCKET) 2>/dev/null; then \
+	  echo "   Bucket ya existe."; \
+	else \
+	  if [ "$(REGION)" = "us-east-1" ]; then \
+	    aws s3api create-bucket --bucket $(TF_BACKEND_BUCKET) --region $(REGION); \
+	  else \
+	    aws s3api create-bucket --bucket $(TF_BACKEND_BUCKET) --region $(REGION) \
+	      --create-bucket-configuration LocationConstraint=$(REGION); \
+	  fi; \
+	  aws s3api put-bucket-versioning \
+	    --bucket $(TF_BACKEND_BUCKET) --versioning-configuration Status=Enabled; \
+	  aws s3api put-bucket-encryption \
+	    --bucket $(TF_BACKEND_BUCKET) \
+	    --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'; \
+	fi
 
-dklogin:
-	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com"
+.PHONY: tf-backend-bucket-delete destroyterraform-all
 
-s3back:
-	aws s3api create-bucket --bucket terraform-dann-nfortiz --region us-east-1 --debug
+# Borra TODAS las versiones y luego elimina el bucket del backend
+tf-backend-bucket-delete:
+	@echo ">> Eliminando objetos versionados en s3://$(TF_BACKEND_BUCKET)"
+	@aws s3api list-object-versions --bucket $(TF_BACKEND_BUCKET) --output json | \
+	  jq -r '.Versions[]?, .DeleteMarkers[]? | {Key:.Key, VersionId:.VersionId} | @json' | \
+	  while read -r obj; do \
+	    key=$$(echo $$obj | jq -r .Key); \
+	    vid=$$(echo $$obj | jq -r .VersionId); \
+	    aws s3api delete-object --bucket $(TF_BACKEND_BUCKET) --key "$$key" --version-id "$$vid" >/dev/null; \
+	  done || true
+	@echo ">> Eliminando bucket s3://$(TF_BACKEND_BUCKET)"
+	@aws s3api delete-bucket --bucket $(TF_BACKEND_BUCKET) --region $(REGION) || true
 
-dkimage:
-	docker build --rm --platform linux/amd64 --no-cache -t "${APP}-app:latest" -f "./apps_nube/${APP}_app/Dockerfile" "./apps_nube/${APP}_app/"
+# Destruye infra y luego elimina el bucket
+destroyterraform-all: destroyterraform tf-backend-bucket-delete
 
-buildimages:
-	make dkimage APP=users
-	make dkimage APP=offers
-	docker build --rm --platform linux/amd64 -t routes-app:latest -f "./apps_nube/routes_service/Dockerfile" "./apps_nube/routes_service/"
-	make dkimage APP=posts
-	make dkimage APP=scores
-	make dkimage APP=rf
 
-dkpush:
-	docker tag "${APP}-app:latest" "${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${APP}-app:latest"
-	docker push "${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${APP}-app:latest"
-
-pushimages:
-	make dkpush APP=users ACCOUNT_ID=${ACCOUNT_ID}
-	make dkpush APP=offers ACCOUNT_ID=${ACCOUNT_ID}
-	make dkpush APP=routes ACCOUNT_ID=${ACCOUNT_ID}
-	make dkpush APP=posts ACCOUNT_ID=${ACCOUNT_ID}
-	make dkpush APP=scores ACCOUNT_ID=${ACCOUNT_ID}
-	make dkpush APP=rf ACCOUNT_ID=${ACCOUNT_ID}
-
-applyk8s:
-	kubectl apply -f "k8s/"
-
-eksk8s:
-	envsubst < "$(CURDIR)/k8s/${APP}_app.deployment.yaml" | kubectl apply -f -
-
-eksapply:
-	make eksk8s APP=users
-	make eksk8s APP=posts
-	make eksk8s APP=routes
-	make eksk8s APP=offer
-	make eksk8s APP=score
-	make eksk8s APP=rf
-	envsubst < "$(CURDIR)/k8s/db.secrets.yaml" | kubectl apply -f -
-	kubectl apply -f "$(shell pwd)/k8s/service-discovery.configmap.yaml"
-    
-# delete all resources in default namespace
-mkdelete:
-	kubectl delete all --all -n default
-
-deletek8s:
-	kubectl delete -f "k8s/"
-
-eksconfig:
-	aws sts get-caller-identity
-	aws eks update-kubeconfig --region us-east-1 --name  ${EKS_CLUSTER_NAME}
-
-eksingressurl:
-	kubectl get svc -n ingress-nginx ingress-nginx-controller 
-
-TERRAFORM_ENV ?= student
-
+# =========================
+# Terraform (componentes)
+# =========================
 tfinit:
-	terraform -chdir="$(shell pwd)/terraform/stacks/${STACK}" init -backend-config="$(shell pwd)/terraform/environments/${TERRAFORM_ENV}/${STACK}/backend.tfvars"
-
-initterraform:
-	make tfinit STACK=eks
-	make tfinit STACK=database
-	make tfinit STACK=registry
+	terraform -chdir="$(shell pwd)/terraform/stacks/${STACK}" init \
+	  -backend-config="$(shell pwd)/terraform/environments/${TERRAFORM_ENV}/${STACK}/backend.tfvars"
 
 tfplan:
-	terraform -chdir="$(shell pwd)/terraform/stacks/${STACK}" plan -var-file="$(shell pwd)/terraform/environments/${TERRAFORM_ENV}/${STACK}/terraform.tfvars" -out="$(STACK).tfplan"
+	terraform -chdir="$(shell pwd)/terraform/stacks/${STACK}" plan \
+	  -var-file="$(shell pwd)/terraform/environments/${TERRAFORM_ENV}/${STACK}/terraform.tfvars" \
+	  -out="$(STACK).tfplan"
 
-planterraform:
-	make tfplan STACK=eks
-	make tfplan STACK=database
-	make tfplan STACK=registry
-
-# apply the created plan file
 tfapply:
 	terraform -chdir="$(shell pwd)/terraform/stacks/${STACK}" apply "$(STACK).tfplan"
 
+tfdestroy:
+	terraform -chdir="$(shell pwd)/terraform/stacks/${STACK}" destroy -auto-approve \
+	  -var-file="$(shell pwd)/terraform/environments/${TERRAFORM_ENV}/${STACK}/terraform.tfvars"
+
+# =========================
+# Terraform (infra)
+# =========================
+initterraform:
+	$(MAKE) tf-backend-bucket REGION=$(REGION) TF_BACKEND_BUCKET=$(TF_BACKEND_BUCKET)
+	$(MAKE) tfinit STACK=registry TERRAFORM_ENV=$(TERRAFORM_ENV)
+
+planterraform:
+	$(MAKE) tfplan STACK=registry TERRAFORM_ENV=$(TERRAFORM_ENV)
+
 applyterraform:
-	make tfapply STACK=eks
-	make tfapply STACK=database
-	make tfapply STACK=registry
+	$(MAKE) tfapply STACK=registry TERRAFORM_ENV=$(TERRAFORM_ENV)
 
-createingress:
-	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-	helm repo update
-	helm install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace --set controller.service.type=LoadBalancer 
-	kubectl get svc -n ingress-nginx ingress-nginx-controller
-	
-applyingress:
-	kubectl apply -f "$(CURDIR)/k8s/ingress.deployment.yaml"
+destroyterraform:
+	$(MAKE) tfdestroy STACK=registry TERRAFORM_ENV=$(TERRAFORM_ENV)
+	$(MAKE) tf-backend-bucket-delete
 
-createinfra:
+
+# =========================
+# Docker Image
+# =========================
+buildimages:
+	docker build --rm --platform linux/amd64 --no-cache -t ${APP}:latest .
+
+ecrlogin:
+	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com"
+
+dkimg:
+	docker tag "${APP}:latest" "${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${APP}:latest"
+	docker push "${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${APP}:latest"
+
+
+# =========================
+# Shortcuts
+# =========================
+
+deployinfrastructure:
 	make initterraform
 	make planterraform
 	make applyterraform
 
-# =========================
-# Sección de destrucción
-# =========================
+uploadimages:
+	make buildimages APP=clasificador-api
+	make ecrlogin
+	make dkimg APP=clasificador-api ACCOUNT_ID=${ACCOUNT_ID}
 
-.PHONY: destroy-k8s destroyterraform tfdestroy ecr-nuke-repos destroyall
-
-destroy-k8s:
-	- kubectl delete -f "$(CURDIR)/k8s/ingress.deployment.yaml"
-	- kubectl delete -f "k8s/"
-	- helm uninstall ingress-nginx -n ingress-nginx
-	- kubectl delete ns ingress-nginx
-	- kubectl delete all --all -n default
-
-tfdestroy:
-	terraform -chdir="$(CURDIR)/terraform/stacks/$(STACK)" destroy \
-		-auto-approve \
-		-var-file="$(CURDIR)/terraform/environments/$(TERRAFORM_ENV)/$(STACK)/terraform.tfvars"
-
-tfdestroy-u:
-	terraform -chdir="$(CURDIR)/terraform/stacks/$(STACK)" destroy \
-		-auto-approve \
-		-var-file="$(CURDIR)/terraform/environments/$(TERRAFORM_ENV)/$(STACK)/terraform.tfvars"
-
-destroyterraform:
-	make tfdestroy STACK=registry
-	make tfdestroy STACK=database
-	make tfdestroy STACK=eks
-
-ecr-nuke-repos:
-	- aws ecr delete-repository --repository-name users-app  --force --region us-east-1
-	- aws ecr delete-repository --repository-name offers-app --force --region us-east-1
-	- aws ecr delete-repository --repository-name routes-app --force --region us-east-1
-	- aws ecr delete-repository --repository-name posts-app  --force --region us-east-1
-	- aws ecr delete-repository --repository-name scores-app --force --region us-east-1
-	- aws ecr delete-repository --repository-name rf-app     --force --region us-east-1
-
-destroyall:
-	make destroy-k8s
-	make destroyterraform
+setup:
+	make deployinfrastructure
+	make uploadimages
