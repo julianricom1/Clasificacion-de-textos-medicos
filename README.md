@@ -17,12 +17,7 @@ make setup
 make deployinfrastructure
 
 // Crear la imagen de la app y cargarla al repositorio
-make uploadimages:
-
-
-
-
-
+make uploadimages
 
 
 ```
