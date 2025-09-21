@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY requirements.txt ./
-COPY model-pkg/textclf_logreg-0.1.0-py3-none-any.whl ./model-pkg/
+COPY model-pkg/textclf_svm-0.1.0-py3-none-any.whl ./model-pkg/
+#COPY model-pkg/textclf_logreg-0.1.0-py3-none-any.whl ./model-pkg/
 
 # crear un environment
 RUN python -m venv /opt/venv \

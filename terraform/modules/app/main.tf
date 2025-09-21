@@ -1,11 +1,5 @@
 data "aws_region" "current" {}
 
-resource "aws_cloudwatch_log_group" "app" {
-  name              = var.log_group_name
-  retention_in_days = 7
-}
-
-
 resource "aws_security_group" "app" {
   name   = "${var.name}-app-sg"
   vpc_id = var.vpc_id
@@ -14,7 +8,7 @@ resource "aws_security_group" "app" {
     from_port       = var.container_port
     to_port         = var.container_port
     protocol        = "tcp"
-    security_groups = [var.alb_sg_id]  # solo tráfico del ALB
+    security_groups = [var.alb_sg_id]
   }
 
   egress {
@@ -23,9 +17,7 @@ resource "aws_security_group" "app" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
 }
-
 
 resource "aws_ecs_task_definition" "this" {
   family                   = "${var.name}-task"
@@ -33,22 +25,21 @@ resource "aws_ecs_task_definition" "this" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.task_cpu
   memory                   = var.task_memory
-  execution_role_arn = var.execution_role_arn
-  task_role_arn      = var.execution_role_arn
-
+  execution_role_arn       = var.execution_role_arn
+  task_role_arn            = var.execution_role_arn
 
   container_definitions = jsonencode([
     {
-      name      = "api",
-      image     = var.container_image,
-      essential = true,
-      portMappings = [{ containerPort = var.container_port, hostPort = var.container_port, protocol = "tcp" }],
-      environment = [ for k, v in var.env_vars : { name = k, value = v } ],
+      name         = "api"
+      image        = var.container_image
+      essential    = true
+      portMappings = [{ containerPort = var.container_port, hostPort = var.container_port, protocol = "tcp" }]
+      environment  = [for k, v in var.env_vars : { name = k, value = v }]
       logConfiguration = {
-        logDriver = "awslogs",
+        logDriver = "awslogs"
         options = {
-          awslogs-group         = var.log_group_name,
-          awslogs-region        = data.aws_region.current.name,
+          awslogs-group         = var.log_group_name
+          awslogs-region        = data.aws_region.current.name
           awslogs-stream-prefix = "api"
         }
       }
@@ -64,7 +55,7 @@ resource "aws_ecs_service" "this" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = var.subnet_ids         # PRIVADAS (salida por NAT)
+    subnets          = var.subnet_ids
     security_groups  = [aws_security_group.app.id]
     assign_public_ip = false
   }

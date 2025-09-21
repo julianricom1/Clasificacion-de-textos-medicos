@@ -9,7 +9,3 @@ output "task_definition_arn" {
 output "app_sg_id" {
   value = aws_security_group.app.id
 }
-
-output "log_group_name" {
-  value = aws_cloudwatch_log_group.app.name
-}

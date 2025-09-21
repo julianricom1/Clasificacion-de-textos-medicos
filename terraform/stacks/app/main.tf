@@ -53,13 +53,13 @@ module "app" {
   source  = "./../../modules/app"
   name    = var.service_name
 
-  vpc_id     = data.terraform_remote_state.vpc.outputs.vpc_id
-  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
-  alb_sg_id  = data.terraform_remote_state.alb.outputs.alb_sg_id
-
-  cluster_arn        = data.terraform_remote_state.ecs.outputs.cluster_arn
+  region           = var.region          
+  vpc_id           = data.terraform_remote_state.vpc.outputs.vpc_id
+  subnet_ids       = data.terraform_remote_state.vpc.outputs.private_subnets
+  alb_sg_id        = data.terraform_remote_state.alb.outputs.alb_sg_id
+  cluster_arn      = data.terraform_remote_state.ecs.outputs.cluster_arn
   execution_role_arn = local.labrole_arn
-  log_group_name     = "/ecs/clasificador-logs"
+  log_group_name   = "/ecs/clasificador-logs"
 
   container_image  = local.container_image
   container_port   = var.container_port
@@ -69,3 +69,4 @@ module "app" {
   target_group_arn = data.terraform_remote_state.alb.outputs.target_group_arn
   env_vars         = var.env_vars
 }
+

@@ -1,7 +1,8 @@
 from typing import Any
 
 ###
-import textclf_logreg as clasificador
+# import textclf_logreg as clasificador
+import textclf_svm as clasificador
 from fastapi import APIRouter, HTTPException
 from loguru import logger
 

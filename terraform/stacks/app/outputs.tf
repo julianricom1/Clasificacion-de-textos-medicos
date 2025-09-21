@@ -9,7 +9,3 @@ output "task_definition_arn" {
 output "app_sg_id" {
   value = module.app.app_sg_id
 }
-
-output "log_group_name" {
-  value = module.app.log_group_name
-}

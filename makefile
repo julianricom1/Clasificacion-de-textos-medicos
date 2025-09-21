@@ -74,8 +74,9 @@ destroyterraform-all: destroyterraform tf-backend-bucket-delete
 # Terraform (componentes)
 # =========================
 .PHONY: tfinit tfplan tfapply tfdestroy
+# Usa -reconfigure para evitar "Backend configuration changed"
 tfinit:
-	terraform -chdir="$(shell pwd)/terraform/stacks/${STACK}" init \
+	terraform -chdir="$(shell pwd)/terraform/stacks/${STACK}" init -reconfigure \
 	  -backend-config="$(shell pwd)/terraform/environments/${TERRAFORM_ENV}/${STACK}/backend.tfvars"
 
 tfplan:
@@ -225,25 +226,27 @@ setup:
 	$(MAKE) deploy-ecs-alb-app
 	$(MAKE) alb-dns
 
-# Imprime el DNS del ALB
+# Imprime el DNS del ALB (via output; fallback a AWS CLI si no existe)
 alb-dns:
-	@ALB_ARN=$$(terraform -chdir="$(CURDIR)/terraform/stacks/alb" output -raw alb_arn); \
-	echo "ALB ARN: $$ALB_ARN"; \
-	echo -n "ALB DNS: "; \
-	aws elbv2 describe-load-balancers --load-balancer-arns $$ALB_ARN --query 'LoadBalancers[0].DNSName' --output text
+	@set -e; \
+	if terraform -chdir="$(CURDIR)/terraform/stacks/alb" output -raw alb_dns >/dev/null 2>&1; then \
+	  echo -n "ALB DNS: "; terraform -chdir="$(CURDIR)/terraform/stacks/alb" output -raw alb_dns; \
+	else \
+	  ALB_ARN=$$(terraform -chdir="$(CURDIR)/terraform/stacks/alb" output -raw alb_arn); \
+	  echo -n "ALB DNS: "; \
+	  aws elbv2 describe-load-balancers --load-balancer-arns $$ALB_ARN --query 'LoadBalancers[0].DNSName' --output text; \
+	fi
 
 # Purga ENIs que bloquean el SG del ALB
-# Purga ENIs que bloquean el SG del ALB (con detach si es necesario)
 purge-alb-enis:
 	@echo ">> Buscando ENIs ligados al SG del ALB..."
-	@ALB_SG=$$(terraform -chdir="$(CURDIR)/terraform/stacks/alb" output -raw alb_sg_id); \
+	@ALB_SG=$$(terraform -chdir="$(CURDIR)/terraform/stacks/alb" output -raw alb_sg_id 2>/dev/null || true); \
 	if [ -z "$$ALB_SG" ]; then echo "   No hay alb_sg_id en outputs (ALB ya destruido?)."; exit 0; fi; \
 	ENIS=$$(aws ec2 describe-network-interfaces --filters Name=group-id,Values=$$ALB_SG --query 'NetworkInterfaces[*].NetworkInterfaceId' --output text); \
 	if [ -n "$$ENIS" ]; then \
 	  echo "   ENIs encontradas: $$ENIS"; \
 	  for eni in $$ENIS; do \
 	    ATT=$$(aws ec2 describe-network-interfaces --network-interface-ids $$eni --query 'NetworkInterfaces[0].Attachment.AttachmentId' --output text 2>/dev/null || true); \
-	    ST=$$(aws ec2 describe-network-interfaces --network-interface-ids $$eni --query 'NetworkInterfaces[0].Status' --output text 2>/dev/null || true); \
 	    if [ "$$ATT" != "None" ] && [ -n "$$ATT" ]; then \
 	      echo "   Detaching $$eni ($$ATT)..."; \
 	      aws ec2 detach-network-interface --attachment-id $$ATT || true; \
@@ -260,7 +263,6 @@ purge-alb-enis:
 	else \
 	  echo "   No hay ENIs asociadas."; \
 	fi
-
 
 # Deja TODO limpio
 fulldestroy:

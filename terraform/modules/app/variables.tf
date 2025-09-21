@@ -1,3 +1,7 @@
+variable "region" {
+  type = string
+}
+
 variable "name" {
   type = string
 }
@@ -37,12 +41,12 @@ variable "container_port" {
 
 variable "task_cpu" {
   type    = number
-  default = 256
+  default = 512
 }
 
 variable "task_memory" {
   type    = number
-  default = 512
+  default = 1024
 }
 
 variable "desired_count" {
