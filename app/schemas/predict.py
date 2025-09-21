@@ -10,6 +10,7 @@ class PredictionResults(BaseModel):
     errors: Optional[Any]
     version: str
     predictions: Optional[List[int]]
+    scores: Optional[List[float]]
     metadata: Optional[dict]
 
 

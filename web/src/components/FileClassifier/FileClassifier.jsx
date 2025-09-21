@@ -3,6 +3,7 @@ import { Button, Box, Typography, Card, CardContent, Grid } from '@mui/material'
 import useClassification from '../../hooks/useClassification';
 import { DataGrid } from '@mui/x-data-grid';
 import Papa from "papaparse";
+import ModelInfo from '../ModelInfo/ModelInfo';
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 90 },
@@ -16,6 +17,13 @@ const columns = [
   {
     field: 'clasificacion',
     headerName: 'Clasificacion',
+    flex: 0.5, // Use flex for dynamic width
+    minWidth: 150, // Minimum width for responsiveness
+    editable: false,
+  },
+  {
+    field: 'score',
+    headerName: 'Score',
     flex: 0.5, // Use flex for dynamic width
     minWidth: 150, // Minimum width for responsiveness
     editable: false,
@@ -33,10 +41,12 @@ function FileClassifier() {
 
   useEffect(() => {
     if (result) {
+      console.log("Result updated:", result);
       const newRows = inputText.map((text, index) => ({
         id: index + 1,
         texto: text,
-        clasificacion: result[index] || 'N/A',
+        clasificacion: result.predictions[index] || 'N/A',
+        score: result.scores[index].toFixed(4) || 'N/A'
       }));
       setRows(newRows);
       setDoCall(false); // Reset doCall after fetching result
@@ -109,40 +119,7 @@ function FileClassifier() {
             disableRowSelectionOnClick
           />
           <br />
-          <Typography >La version usada del modelo es <strong>{metadata.model_version}</strong></Typography>
-          <Typography >Metricas del modelo</Typography>
-          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-            <Card sx={{ minWidth: '18.8%' }}>
-              <CardContent>
-                <Typography variant="subtitle1">PR_AUC</Typography>
-                <Typography variant="h5">{metadata.metrics.pr_auc}</Typography>
-              </CardContent>
-            </Card>
-            <Card sx={{ minWidth: '18.8%' }}>
-              <CardContent>
-                <Typography variant="subtitle1">ROC_AUC</Typography>
-                <Typography variant="h5">{metadata.metrics.roc_auc}</Typography>
-              </CardContent>
-            </Card>
-            <Card sx={{ minWidth: '18.8%' }}>
-              <CardContent>
-                <Typography variant="subtitle1">F1</Typography>
-                <Typography variant="h5">{metadata.metrics.f1_score}</Typography>
-              </CardContent>
-            </Card>
-            <Card sx={{ minWidth: '18.8%' }}>
-              <CardContent>
-                <Typography variant="subtitle1">Recall</Typography>
-                <Typography variant="h5">{metadata.metrics.recall}</Typography>
-              </CardContent>
-            </Card>
-            <Card sx={{ minWidth: '18.8%' }}>
-              <CardContent>
-                <Typography variant="subtitle1">Accuracy</Typography>
-                <Typography variant="h5">{metadata.metrics.accuracy}</Typography>
-              </CardContent>
-            </Card>
-          </Box>
+          <ModelInfo metadata={metadata} />
         </Box>
       )}
     </Box>

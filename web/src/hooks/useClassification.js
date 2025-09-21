@@ -21,11 +21,12 @@ function useClassification({ inputText, doCall = false }) {
           inputs: text,
         }
       );
-      setResult(
-        response.data.predictions.map((clasification) =>
+      setResult({
+        predictions: response.data.predictions.map((clasification) =>
           clasification === 1 ? "Tecnico" : "Plano"
-        )
-      );
+        ),
+        scores: response.data.scores,
+      });
       setMetadata(response.data.metadata);
     } catch (error) {
       console.error("Error fetching prediction:", error);

@@ -43,19 +43,22 @@ async def predict(input_data: schemas.MultipleDataInputs) -> Any:
     except Exception as e:
         logger.warning(f"Prediction error: {e}")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {e}")
+    logger.info(f"outputs: {output["scores"]}")
 
+    metrics = clasificador.metrics()
     return {
         "predictions": output["labels"],
+        "scores": output["scores"],
         "errors": None,
         "version": MODEL_VERSION,
         "metadata": {
             "model_version": MODEL_VERSION,
             "metrics": {
-                "accuracy": 0.99,
-                "recall": 0.99,
-                "f1_score": 0.99,
-                "pr_auc": 0.99,
-                "roc_auc": 0.99,
+                "accuracy": metrics["accuracy"],
+                "recall": metrics["recall"],
+                "f1_score": metrics["f1"],
+                "pr_auc": metrics["pr_auc"],
+                "roc_auc": metrics["roc_auc"],
             },
         }
     }
