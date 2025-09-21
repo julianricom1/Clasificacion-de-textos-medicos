@@ -230,12 +230,12 @@ setup:
 alb-dns:
 	@set -e; \
 	if terraform -chdir="$(CURDIR)/terraform/stacks/alb" output -raw alb_dns >/dev/null 2>&1; then \
-	  echo -n "ALB DNS: "; terraform -chdir="$(CURDIR)/terraform/stacks/alb" output -raw alb_dns; \
+	  DNS=$$(terraform -chdir="$(CURDIR)/terraform/stacks/alb" output -raw alb_dns); \
 	else \
 	  ALB_ARN=$$(terraform -chdir="$(CURDIR)/terraform/stacks/alb" output -raw alb_arn); \
-	  echo -n "ALB DNS: "; \
-	  aws elbv2 describe-load-balancers --load-balancer-arns $$ALB_ARN --query 'LoadBalancers[0].DNSName' --output text; \
-	fi
+	  DNS=$$(aws elbv2 describe-load-balancers --load-balancer-arns $$ALB_ARN --query 'LoadBalancers[0].DNSName' --output text); \
+	fi; \
+	printf "\nALB DNS: %s\n\n" "$$DNS"
 
 # Purga ENIs que bloquean el SG del ALB
 purge-alb-enis:
