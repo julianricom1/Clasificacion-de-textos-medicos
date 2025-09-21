@@ -114,8 +114,11 @@ destroyterraform:
 # Docker Image
 # =========================
 .PHONY: buildimages ecrlogin dkimg
-buildimages:
-	docker build --rm --platform linux/amd64 --no-cache -t ${APP}:latest .
+buildimageapi:
+	docker build --rm --platform linux/amd64 --no-cache -f app/Dockerfile -t ${APP}:latest .
+
+buildimagefront:
+	docker build --rm --platform linux/amd64 --no-cache -f web/Dockerfile -t ${APP}:latest .
 
 ecrlogin:
 	aws ecr get-login-password --region $(REGION) | docker login --username AWS --password-stdin "$(ACCOUNT_ID).dkr.ecr.$(REGION).amazonaws.com"
@@ -214,9 +217,11 @@ deployinfrastructure:
 	$(MAKE) applyterraform
 
 uploadimages:
-	$(MAKE) buildimages APP=clasificador-api
+	$(MAKE) buildimageapi APP=clasificador-api
+	$(MAKE) buildimagefront APP=clasificador-front
 	$(MAKE) ecrlogin
 	$(MAKE) dkimg APP=clasificador-api
+	$(MAKE) dkimg APP=clasificador-front
 
 # Construye TODO desde cero:
 setup:

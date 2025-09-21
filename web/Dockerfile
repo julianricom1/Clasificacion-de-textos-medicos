@@ -2,11 +2,10 @@
 FROM node:22 AS build
 ENV REACT_APP_API_DOMAIN=http://localhost REACT_APP_PORT=8000
 WORKDIR /web
-COPY package.json package-lock.json ./
+COPY web/package.json web/package-lock.json ./
 RUN yarn
-COPY . .
+COPY web/. .
 RUN yarn run build
-
 
 # Stage 2: Serve the app with a lightweight web server
 FROM nginx:alpine
