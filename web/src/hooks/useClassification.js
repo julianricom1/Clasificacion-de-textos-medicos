@@ -10,8 +10,8 @@ function useClassification({ inputText, doCall = false }) {
     if (doCall) fetchPrediction(inputText);
   }, [doCall]);
 
-  const API_DOMAIN = "http://localhost"; // Replace with your actual domain
-  const PORT = "8001"; // Replace with your actual domain
+  const API_DOMAIN = process.env.REACT_APP_API_DOMAIN || "http://localhost"; // Default to "http://localhost" if not set
+  const PORT = process.env.REACT_APP_PORT || "8001"; // Default to "8001" if not set
 
   const fetchPrediction = async (text) => {
     try {
