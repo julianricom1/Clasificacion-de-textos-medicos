@@ -277,3 +277,19 @@ fulldestroy:
 	$(MAKE) purge-alb-enis
 	$(MAKE) vpc-destroy
 	$(MAKE) destroyterraform-all
+
+# =========================
+# Re-deploys
+# =========================
+.PHONY: redeployapi redeployfront
+redeployapi:
+	$(MAKE) buildimageapi APP=clasificador-api
+	$(MAKE) ecrlogin
+	$(MAKE) dkimg APP=clasificador-api
+	$(MAKE) app-apply
+
+redeployfront:
+	$(MAKE) buildimagefront APP=clasificador-front
+	$(MAKE) ecrlogin
+	$(MAKE) dkimg APP=clasificador-front
+	$(MAKE) front-apply
