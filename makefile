@@ -7,9 +7,8 @@ REGION            ?= us-east-1
 TF_BACKEND_BUCKET ?= infrastructura-clasificador-g8
 ACCOUNT_ID        := $(shell aws sts get-caller-identity --query Account --output text)
 
-
 # ================
-# Backend S3
+# Bucket S3
 # ================
 .PHONY: tf-backend-bucket tf-backend-bucket-delete destroyterraform-all
 tf-backend-bucket:
@@ -48,7 +47,7 @@ destroyterraform-all: destroyterraform tf-backend-bucket-delete
 
 
 # =========================
-# Terraform (componentes)
+# Terraform Stack
 # =========================
 .PHONY: tfinit tfplan tfapply tfdestroy
 # Usa -reconfigure para evitar "Backend configuration changed"
@@ -70,7 +69,7 @@ tfdestroy:
 
 
 # =========================
-# Terraform (registry)
+# Registry
 # =========================
 .PHONY: initterraform planterraform applyterraform destroyterraform
 initterraform:
@@ -128,7 +127,7 @@ deploy-vpc:
 
 
 # =========================
-# Terraform (ECS/ALB/APP)
+# Terraform (backend)
 # =========================
 .PHONY: ecs-init ecs-plan ecs-apply ecs-destroy \
         alb-init alb-plan alb-apply alb-destroy \
@@ -167,7 +166,7 @@ app-destroy:
 
 
 # =========================
-# Terraform (frontend
+# Terraform (frontend)
 # =========================
 
 .PHONY: front-init front-plan front-apply front-destroy
@@ -188,7 +187,12 @@ deployfrontend:
 	$(MAKE) front-plan
 	$(MAKE) front-apply
 
-# Orquestación end-to-end (ECS -> ALB -> APP)
+
+# =========================
+# Orquestacion (backend)
+# =========================
+# (ECS -> ALB -> APP)
+
 deploy-ecs-alb-app:
 	$(MAKE) ecs-init
 	$(MAKE) ecs-plan
@@ -207,30 +211,10 @@ destroy-ecs-alb-app:
 
 
 # =========================
-# Shortcuts
+# Utilidades
 # =========================
-.PHONY: deployinfrastructure uploadimages setup fulldestroy alb-dns purge-alb-enis
 
-deployinfrastructure:
-	$(MAKE) initterraform
-	$(MAKE) planterraform
-	$(MAKE) applyterraform
-
-uploadimages:
-	$(MAKE) buildimageapi APP=clasificador-api
-	$(MAKE) buildimagefront APP=clasificador-front
-	$(MAKE) ecrlogin
-	$(MAKE) dkimg APP=clasificador-api
-	$(MAKE) dkimg APP=clasificador-front
-
-# Construye TODO desde cero:
-setup:
-	$(MAKE) deployinfrastructure
-	$(MAKE) uploadimages
-	$(MAKE) deploy-vpc
-	$(MAKE) deploy-ecs-alb-app
-	$(MAKE) deployfrontend
-	$(MAKE) alb-dns
+.PHONY: alb-dns purge-alb-enis
 
 # Imprime el DNS del ALB (via output; fallback a AWS CLI si no existe)
 alb-dns:
@@ -241,7 +225,7 @@ alb-dns:
 	  ALB_ARN=$$(terraform -chdir="$(CURDIR)/terraform/stacks/alb" output -raw alb_arn); \
 	  DNS=$$(aws elbv2 describe-load-balancers --load-balancer-arns $$ALB_ARN --query 'LoadBalancers[0].DNSName' --output text); \
 	fi; \
-	printf "\nALB DNS: %s\n\n" "$$DNS"
+	printf "\nALB URL: http://%s/\n\n" "$$DNS"
 
 # Purga ENIs que bloquean el SG del ALB
 purge-alb-enis:
@@ -270,8 +254,35 @@ purge-alb-enis:
 	  echo "   No hay ENIs asociadas."; \
 	fi
 
+
+# ====================================================================================================
+#                                                Shortcuts
+# ====================================================================================================
+.PHONY: deployinfrastructure uploadimages startall destroyall 
+
+deployinfrastructure:
+	$(MAKE) initterraform
+	$(MAKE) planterraform
+	$(MAKE) applyterraform
+
+uploadimages:
+	$(MAKE) buildimageapi APP=clasificador-api
+	$(MAKE) buildimagefront APP=clasificador-front
+	$(MAKE) ecrlogin
+	$(MAKE) dkimg APP=clasificador-api
+	$(MAKE) dkimg APP=clasificador-front
+
+# Construye TODO desde cero
+startall:
+	$(MAKE) deployinfrastructure
+	$(MAKE) uploadimages
+	$(MAKE) deploy-vpc
+	$(MAKE) deploy-ecs-alb-app
+	$(MAKE) deployfrontend
+	$(MAKE) alb-dns
+
 # Deja TODO limpio
-fulldestroy:
+destroyall:
 	$(MAKE) front-destroy
 	$(MAKE) destroy-ecs-alb-app
 	$(MAKE) purge-alb-enis
@@ -286,10 +297,11 @@ redeployapi:
 	$(MAKE) buildimageapi APP=clasificador-api
 	$(MAKE) ecrlogin
 	$(MAKE) dkimg APP=clasificador-api
-	$(MAKE) app-apply
+	$(MAKE) deploy-ecs-alb-app
 
 redeployfront:
 	$(MAKE) buildimagefront APP=clasificador-front
 	$(MAKE) ecrlogin
 	$(MAKE) dkimg APP=clasificador-front
-	$(MAKE) front-apply
+	$(MAKE) front-destroy
+	$(MAKE) deployfrontend
