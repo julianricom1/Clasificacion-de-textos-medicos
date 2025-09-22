@@ -1,26 +1,3 @@
-# =========================
-# Lint / Tests
-# =========================
-.PHONY: lintfix lintcheck unittest
-lintfix:
-	poetry --directory="$(DIR)" install
-	poetry --directory="$(DIR)" run black .
-	poetry --directory="$(DIR)" run isort . --profile black
-	poetry --directory="$(DIR)" run bandit -c pyproject.toml -r .
-	poetry --directory="$(DIR)" run ruff check --fix
-
-lintcheck:
-	poetry --directory="$(DIR)" install
-	poetry --directory="$(DIR)" run black --check .
-	poetry --directory="$(DIR)" run isort --check . --profile black
-	poetry --directory="$(DIR)" run bandit -c pyproject.toml -r .
-	poetry --directory="$(DIR)" run ruff check
-
-unittest:
-	poetry --directory="$(DIR)" install
-	poetry --directory="$(DIR)" run pytest --cov=src -v -s --cov-fail-under=70 --cov-report term-missing
-
-
 # =========
 # Variables
 # =========
@@ -188,6 +165,29 @@ app-apply:
 app-destroy:
 	$(MAKE) tfdestroy STACK=app TERRAFORM_ENV=$(TERRAFORM_ENV)
 
+
+# =========================
+# Terraform (frontend
+# =========================
+
+.PHONY: front-init front-plan front-apply front-destroy
+front-init:
+	$(MAKE) tfinit STACK=web TERRAFORM_ENV=$(TERRAFORM_ENV)
+
+front-plan:
+	$(MAKE) tfplan STACK=web TERRAFORM_ENV=$(TERRAFORM_ENV)
+
+front-apply:
+	$(MAKE) tfapply STACK=web TERRAFORM_ENV=$(TERRAFORM_ENV)
+
+front-destroy:
+	$(MAKE) tfdestroy STACK=web TERRAFORM_ENV=$(TERRAFORM_ENV)
+
+deployfrontend:
+	$(MAKE) front-init
+	$(MAKE) front-plan
+	$(MAKE) front-apply
+
 # Orquestación end-to-end (ECS -> ALB -> APP)
 deploy-ecs-alb-app:
 	$(MAKE) ecs-init
@@ -229,6 +229,7 @@ setup:
 	$(MAKE) uploadimages
 	$(MAKE) deploy-vpc
 	$(MAKE) deploy-ecs-alb-app
+	$(MAKE) deployfrontend
 	$(MAKE) alb-dns
 
 # Imprime el DNS del ALB (via output; fallback a AWS CLI si no existe)
@@ -271,6 +272,7 @@ purge-alb-enis:
 
 # Deja TODO limpio
 fulldestroy:
+	$(MAKE) front-destroy
 	$(MAKE) destroy-ecs-alb-app
 	$(MAKE) purge-alb-enis
 	$(MAKE) vpc-destroy

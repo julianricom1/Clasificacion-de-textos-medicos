@@ -1,6 +1,5 @@
 # Stage 1: Build the React app
 FROM node:22 AS build
-ENV REACT_APP_API_DOMAIN=http://localhost REACT_APP_PORT=8000
 WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN yarn
