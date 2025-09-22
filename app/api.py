@@ -10,8 +10,6 @@ from loguru import logger
 # from model.predict import make_prediction
 from app import __version__, schemas
 from app.config import settings
-import pandas as pd
-from fastapi import UploadFile, File
 
 MODEL_VERSION = "0.1.0"
 ###
@@ -43,7 +41,7 @@ async def predict(input_data: schemas.MultipleDataInputs) -> Any:
     except Exception as e:
         logger.warning(f"Prediction error: {e}")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {e}")
-    logger.info(f"outputs: {output["scores"]}")
+    logger.info(f"outputs: {output['scores']}")
 
     metrics = clasificador.metrics()
     return {
@@ -60,5 +58,5 @@ async def predict(input_data: schemas.MultipleDataInputs) -> Any:
                 "pr_auc": metrics["pr_auc"],
                 "roc_auc": metrics["roc_auc"],
             },
-        }
+        },
     }

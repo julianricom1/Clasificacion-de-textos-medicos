@@ -2,7 +2,7 @@ region = "us-east-1"
 owner  = "j.rico566"
 
 keep_tags_number = 2
-repositories_names = ["clasificador-api"]
+repositories_names = ["clasificador-api", "clasificador-front"]
 # variable "repositories_names" {
 #   description = "Name of the repositories to be created"
 #   type        = list(string)
