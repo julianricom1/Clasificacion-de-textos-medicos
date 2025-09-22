@@ -11,12 +11,13 @@ function useClassification({ inputText, doCall = false }) {
   }, [doCall]);
 
   const API_DOMAIN = process.env.REACT_APP_API_DOMAIN || "http://localhost"; // Default to "http://localhost" if not set
-  const PORT = process.env.REACT_APP_PORT || "8000"; 
+  //const PORT = process.env.REACT_APP_PORT || "8000"; 
 
   const fetchPrediction = async (text) => {
     try {
       const response = await axios.post(
-        `${API_DOMAIN}:${PORT}/api/v1/predict`,
+        //`${API_DOMAIN}:${PORT}/api/v1/predict`,
+        `${API_DOMAIN}/api/v1/predict`,
         {
           inputs: text,
         }

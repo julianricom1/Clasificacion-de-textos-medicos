@@ -1,9 +1,0 @@
-:80 {
-	# sirve el build estático
-	root * /srv
-	file_server
-
-	# proxy transparente del API (evita CORS)
-	@api path /api/*
-	reverse_proxy @api {$API_ORIGIN}
-}
