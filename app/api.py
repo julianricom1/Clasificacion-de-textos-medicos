@@ -1,10 +1,7 @@
 from typing import Any
-import anthropic
 import os
+from app.helpers.external_model_source import ExternalModel, SupportedModels
 from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
 
 ###
 # import textclf_logreg as clasificador
@@ -19,11 +16,6 @@ from app.config import settings
 
 MODEL_VERSION = "0.1.0"
 ###
-
-# Initialize Anthropic client
-client = anthropic.Anthropic(
-    api_key=os.getenv("ANTHROPIC_API_KEY")
-)
 
 api_router = APIRouter()
 
@@ -82,34 +74,13 @@ async def generate(input_data: schemas.MultipleDataInputs) -> Any:
         # Call OpenAI API to generate text based on classification
         generated_texts = []
         for i, text in enumerate(texts):
-            
-            # Create prompt based on classification result
-            prompt = f"""
-            Based on the medical text classification result:
-            
-            Original text: "{text}"
-            
-            Generate a brief explanation about this medical text classification and provide suggestions for improvement if needed.
-            """
-            
-            try:
-                response = client.messages.create(
-                    model="claude-3-5-sonnet-20241022",
-                    max_tokens=200,
-                    temperature=0.7,
-                    system="You are a medical text analysis assistant that helps explain text classifications and provides improvement suggestions.",
-                    messages=[
-                        {"role": "user", "content": prompt}
-                    ]
-                )
 
-                generated_text = response.content[0].text
-                generated_texts.append(generated_text)
-                
-            except Exception as anthropic_error:
-                logger.warning(f"Anthropic API error: {anthropic_error}")
-                generated_texts.append(f"Error generating explanation for: {text[:50]}...")
-                
+            model = ExternalModel(
+                prompt=text, model_name=SupportedModels.CLAUDE_SONNET_4
+            )
+
+            generated_text = model.generate()
+            generated_texts.append(generated_text)
     except Exception as e:
         logger.warning(f"Generation error: {e}")
         raise HTTPException(status_code=500, detail=f"Generation failed: {e}")
