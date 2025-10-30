@@ -1,6 +1,10 @@
 from typing import Any
-from openai import OpenAI
+import anthropic
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 ###
 # import textclf_logreg as clasificador
@@ -16,11 +20,9 @@ from app.config import settings
 MODEL_VERSION = "0.1.0"
 ###
 
-# Initialize OpenAI client
-client = OpenAI(
-    # This is the default and can be omitted
-    api_key='sk-...',
-    #api_key=os.environ.get("OPENAI_API_KEY"),
+# Initialize Anthropic client
+client = anthropic.Anthropic(
+    api_key=os.getenv("ANTHROPIC_API_KEY")
 )
 
 api_router = APIRouter()
@@ -71,7 +73,7 @@ async def predict(input_data: schemas.MultipleDataInputs) -> Any:
     }
 
 
-@api_router.post("/generate", response_model=schemas.PredictionResults, status_code=200)
+@api_router.post("/generate", response_model=schemas.GenerationResults, status_code=200)
 async def generate(input_data: schemas.MultipleDataInputs) -> Any:
     texts = [str(t) for t in input_data.inputs]
     logger.info(f"Making generation on inputs: {texts}")
@@ -91,18 +93,22 @@ async def generate(input_data: schemas.MultipleDataInputs) -> Any:
             """
             
             try:
-                response = client.responses.create(
-                    model="gpt-4o",
-                    instructions= "You are a medical text analysis assistant that helps explain text classifications and provides improvement suggestions.",
-                    input= prompt,
-                    temperature=0.7
+                response = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=200,
+                    temperature=0.7,
+                    system="You are a medical text analysis assistant that helps explain text classifications and provides improvement suggestions.",
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ]
                 )
-                
-                generated_text = response.output_text
+
+                generated_text = response.content[0].text
                 generated_texts.append(generated_text)
                 
-            except Exception as openai_error:
-                logger.warning(f"OpenAI API error: {openai_error}")
+            except Exception as anthropic_error:
+                logger.warning(f"Anthropic API error: {anthropic_error}")
+                generated_texts.append(f"Error generating explanation for: {text[:50]}...")
                 
     except Exception as e:
         logger.warning(f"Generation error: {e}")
