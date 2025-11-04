@@ -4,6 +4,8 @@ import axios from "axios";
 function useGeneration({ inputText, doCall = false }) {
   const [result, setResult] = useState(null);
   const [metadata, setMetadata] = useState({});
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Example effect: fetch initial data or perform setup
@@ -15,6 +17,7 @@ function useGeneration({ inputText, doCall = false }) {
 
   const fetchPrediction = async (text) => {
     try {
+      setLoading(true);
       const response = await axios.post(`${API_DOMAIN}/api/v1/generate`, {
         inputs: text,
       });
@@ -22,12 +25,16 @@ function useGeneration({ inputText, doCall = false }) {
         generation: response.data.generation,
       });
       setMetadata(response.data.metadata);
+      setError(false);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching prediction:", error);
+      setError(true);
+      setLoading(false);
     }
   };
 
-  return { result, metadata };
+  return { result, metadata, error, loading };
 }
 
 export default useGeneration;
