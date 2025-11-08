@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 
 class SupportedModels(Enum):
     CLAUDE_SONNET_4 = "claude-sonnet-4-5"
-    CHATGPT_4 = "gpt-4-turbo-preview" ##usar gpt 5
+    CHATGPT_4 = "gpt-4-turbo-preview"
+    CHATGPT_5 = "gpt-5"
 
 class ExternalModel:
     def __init__(self, prompt: str, model_name: SupportedModels):
@@ -26,7 +27,7 @@ class ExternalModel:
         """Generate response using the specified external model."""
         if self.model_name == SupportedModels.CLAUDE_SONNET_4:
             return self._call_anthropic_api(self.prompt)
-        elif self.model_name == SupportedModels.CHATGPT_4:
+        elif self.model_name == SupportedModels.CHATGPT_4 or self.model_name == SupportedModels.CHATGPT_5:
             return self._call_openai_api(self.prompt)
         else:
             raise ValueError(f"Unsupported model: {self.model_name}")

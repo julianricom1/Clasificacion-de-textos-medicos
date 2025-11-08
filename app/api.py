@@ -76,7 +76,7 @@ async def generate(input_data: schemas.MultipleDataInputs) -> Any:
         for i, text in enumerate(texts):
 
             model = ExternalModel(
-                prompt=text, model_name=SupportedModels.CLAUDE_SONNET_4
+                prompt=text, model_name=SupportedModels.CHATGPT_5
             )
 
             generated_text = model.generate()
