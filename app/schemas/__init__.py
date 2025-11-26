@@ -1,2 +1,2 @@
 from .health import Health
-from .predict import MultipleDataInputs, PredictionResults, GenerationResults, GenerationRequest
+from .predict import MultipleDataInputs, PredictionResults, GenerationResults

@@ -26,6 +26,3 @@ class MultipleDataInputs(BaseModel):
 
     class Config:
         schema_extra = {"example": {"inputs": ["Sample text for prediction"]}}
-class GenerationRequest(BaseModel):
-    prompt: str
-    model: str

@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 class SupportedModels(Enum):
     CLAUDE_SONNET_4 = "claude-sonnet-4-5"
-    CHATGPT_4 = "gpt-4-turbo-preview" ##usar gpt 5
+    CHATGPT_4 = "gpt-4-turbo-preview"
 
 class ExternalModel:
     def __init__(self, prompt: str, model_name: SupportedModels):
