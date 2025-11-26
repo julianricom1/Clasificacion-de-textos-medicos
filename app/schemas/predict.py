@@ -13,12 +13,6 @@ class PredictionResults(BaseModel):
     scores: Optional[List[float]]
     metadata: Optional[dict]
 
-class GenerationResults(BaseModel):
-    errors: Optional[Any]
-    version: str
-    generation: Optional[List[str]]
-    scores: Optional[List[float]]
-    metadata: Optional[dict]
 
 # Esquema para inputs múltiples
 class MultipleDataInputs(BaseModel):
