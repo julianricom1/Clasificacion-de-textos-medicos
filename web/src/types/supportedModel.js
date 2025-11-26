@@ -1,18 +1,6 @@
 export const SupportedModels = {
-  OLLAMA_FINNED_TUNNED: {
-    name: 'ollama_finned_tunned',
-    displayName: 'Ollama Finned Tunned'
-  },
-  CLAUDE_SONNET_4: {
-    name: 'claude-sonnet-4-5',
-    displayName: 'Claude Sonnet 4'
-  },
-  CHATGPT_4: {
-    name: 'gpt-4-turbo-preview',
-    displayName: 'ChatGPT 4'
-  },
-  CHATGPT_5: {
-    name: 'gpt-5',
-    displayName: 'ChatGPT 5'
-  }
+  OLLAMA_FINNED_TUNNED: 'ollama_finned_tunned',
+  CLAUDE_SONNET_4: 'claude-sonnet-4-5',
+  CHATGPT_4: 'gpt-4-turbo-preview',
+  CHATGPT_5: 'gpt-5'
 };

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const DEFAULT_BASE_URL = `http://${window.location.hostname}:8001`;
+const DEFAULT_BASE_URL = `http://${window.location.hostname}:8000`;
 
 function useMetrics({ original, generated, doCall = false }) {
   const [loading, setLoading] = useState(false);
