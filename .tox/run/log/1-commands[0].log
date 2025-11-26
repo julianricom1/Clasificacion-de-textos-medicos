@@ -1,12 +1,12 @@
 name: run
 run_id: commands[0]
-env COLUMNS: 120
+env COLUMNS: 157
 env HOME: /Users/carlosurrego
 env LANG: en_US.UTF-8
-env LINES: 22
-env PATH: /Users/carlosurrego/Documents/master/desarrollo-soluciones/Clasificacion-de-textos-medicos/.tox/test_app/bin:/Users/carlosurrego/.nvm/versions/node/v20.18.1/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/anaconda3/bin:/opt/anaconda3/condabin:/Users/carlosurrego/.vscode/extensions/ms-python.debugpy-2025.14.1-darwin-arm64/bundled/scripts/noConfigScripts:/Users/carlosurrego/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand
+env LINES: 19
+env PATH: /Users/carlosurrego/Documents/master/desarrollo-soluciones/Clasificacion-de-textos-medicos/.tox/test_app/bin:/Users/carlosurrego/.nvm/versions/node/v20.15.1/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/anaconda3/bin:/opt/anaconda3/condabin
 env PIP_DISABLE_PIP_VERSION_CHECK: 1
-env PYTHONHASHSEED: 3093679455
+env PYTHONHASHSEED: 2548912019
 env PYTHONIOENCODING: utf-8
 env PYTHONPATH: .
 env SSH_AUTH_SOCK: ***************************************************
@@ -16,14 +16,13 @@ env TOX_ENV_DIR: /Users/carlosurrego/Documents/master/desarrollo-soluciones/Clas
 env TOX_ENV_NAME: run
 env TOX_WORK_DIR: /Users/carlosurrego/Documents/master/desarrollo-soluciones/Clasificacion-de-textos-medicos/.tox
 env VIRTUAL_ENV: /Users/carlosurrego/Documents/master/desarrollo-soluciones/Clasificacion-de-textos-medicos/.tox/test_app
-metadata pid: 60366
+metadata pid: 18154
 cwd: /Users/carlosurrego/Documents/master/desarrollo-soluciones/Clasificacion-de-textos-medicos
 allow: /Users/carlosurrego/Documents/master/desarrollo-soluciones/Clasificacion-de-textos-medicos/.tox/test_app/bin/*
 cmd: python app/main.py
 exit_code: -15
-[32mINFO[0m:     127.0.0.1:52475 - "[1mPOST /api/v1/generate HTTP/1.1[0m" [32m200 OK[0m
-[32mINFO[0m:     127.0.0.1:52932 - "[1mOPTIONS /api/v1/generate HTTP/1.1[0m" [32m200 OK[0m
-[32mINFO[0m:     127.0.0.1:52932 - "[1mPOST /api/v1/generate HTTP/1.1[0m" [32m200 OK[0m
+[32mINFO[0m:     127.0.0.1:60710 - "[1mOPTIONS /api/v1/predict HTTP/1.1[0m" [32m200 OK[0m
+[32mINFO[0m:     127.0.0.1:60710 - "[1mPOST /api/v1/predict HTTP/1.1[0m" [32m200 OK[0m
 
 standard error:
 /Users/carlosurrego/Documents/master/desarrollo-soluciones/Clasificacion-de-textos-medicos/.tox/test_app/lib/python3.12/site-packages/sklearn/base.py:442: InconsistentVersionWarning: Trying to unpickle estimator TfidfTransformer from version 1.6.1 when using version 1.7.2. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:
@@ -35,17 +34,15 @@ https://scikit-learn.org/stable/model_persistence.html#security-maintainability-
 /Users/carlosurrego/Documents/master/desarrollo-soluciones/Clasificacion-de-textos-medicos/.tox/test_app/lib/python3.12/site-packages/sklearn/base.py:442: InconsistentVersionWarning: Trying to unpickle estimator SVC from version 1.6.1 when using version 1.7.2. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:
 https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations
   warnings.warn(
-[32m2025-10-15 10:48:45.556[0m | [33m[1mWARNING [0m | [36m__main__[0m:[36m<module>[0m:[36m55[0m - [33m[1mRunning in development mode. Do not run like this in production.[0m
-[32mINFO[0m:     Started server process [[36m60366[0m]
+[32m2025-09-21 11:27:33.150[0m | [33m[1mWARNING [0m | [36m__main__[0m:[36m<module>[0m:[36m55[0m - [33m[1mRunning in development mode. Do not run like this in production.[0m
+[32mINFO[0m:     Started server process [[36m18154[0m]
 [32mINFO[0m:     Waiting for application startup.
 [32mINFO[0m:     Application startup complete.
 [32mINFO[0m:     Uvicorn running on [1mhttp://0.0.0.0:8001[0m (Press CTRL+C to quit)
-[32m2025-10-15 10:49:58.114[0m | [1mINFO    [0m | [36mapp.api[0m:[36mgenerate[0m:[36m77[0m - [1mMaking generation on inputs: ['dasdasd'][0m
-[32m2025-10-15 10:49:58.718[0m | [33m[1mWARNING [0m | [36mapp.api[0m:[36mgenerate[0m:[36m105[0m - [33m[1mOpenAI API error: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-.... You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}[0m
-[32m2025-10-15 10:51:33.125[0m | [1mINFO    [0m | [36mapp.api[0m:[36mgenerate[0m:[36m77[0m - [1mMaking generation on inputs: ['dasdad'][0m
-[32m2025-10-15 10:51:34.665[0m | [33m[1mWARNING [0m | [36mapp.api[0m:[36mgenerate[0m:[36m105[0m - [33m[1mOpenAI API error: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-.... You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}[0m
+[32m2025-09-21 11:27:46.517[0m | [1mINFO    [0m | [36mapp.api[0m:[36mpredict[0m:[36m39[0m - [1mMaking prediction on inputs: ['hola mundo'][0m
+[32m2025-09-21 11:27:46.526[0m | [1mINFO    [0m | [36mapp.api[0m:[36mpredict[0m:[36m46[0m - [1moutputs: [0.3397297175410048][0m
 [32mINFO[0m:     Shutting down
-[32mINFO[0m:     Finished server process [[36m60366[0m]
+[32mINFO[0m:     Finished server process [[36m18154[0m]
 [31mERROR[0m:    Traceback (most recent call last):
   File "/opt/anaconda3/lib/python3.12/asyncio/runners.py", line 194, in run
     return runner.run(main)
