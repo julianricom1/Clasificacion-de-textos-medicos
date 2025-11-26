@@ -1,1 +1,0 @@
-regex:dapi[a-zA-Z0-9]{32}==REDACTED_DATABRICKS_TOKEN
